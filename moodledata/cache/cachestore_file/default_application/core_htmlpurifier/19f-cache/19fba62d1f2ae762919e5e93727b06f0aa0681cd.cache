@@ -1,0 +1,2 @@
+s:311:"<p>This option enables maintanance mode during and after the database migration, it prevents access of all users until the migration is completed. Please note that administrator has to manually delete $CFG-&gt;dataroot/climaintenance.html file after updating config.php settings to resume normal operation.</p>
+";
