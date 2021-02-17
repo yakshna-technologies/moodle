@@ -18,10 +18,13 @@ $CFG->dboptions = array (
   'dbcollation' => 'utf8mb4_general_ci',
 );
 
+/* $CFG->wwwroot   = 'http://testlms.yakshnatechnologies.in';
+$CFG->dataroot  = 'C:\\inetpub\\wwwroot\\moodle-3.10 (1)\\moodledata';
+$CFG->admin     = 'admin';
+*/
 $CFG->wwwroot   = 'http://testlms.yakshnatechnologies.in';
 $CFG->dataroot  = 'C:\\inetpub\\wwwroot\\moodle-3.10 (1)\\moodledata';
 $CFG->admin     = 'admin';
-
 $CFG->directorypermissions = 0777;
 
 require_once(__DIR__ . '/lib/setup.php');
