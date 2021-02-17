@@ -1,5 +1,5 @@
 <?php  // Moodle configuration file
-//this is test changes
+//this is for testing the configuration
 unset($CFG);
 global $CFG;
 $CFG = new stdClass();
