@@ -24,7 +24,7 @@ os: windows
   deploy:
     provider: pages
     skip-cleanup: true
-    github-token: $travismoodleci
+    github-token: $GITHUB_TOKEN
     on:
       branch: moodle_branch_1
 
