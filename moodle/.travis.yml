@@ -1,7 +1,7 @@
 # PLEASE NOTE: Travis is not currently utilised by the Moodle core integration
 # process (which uses our internal CI system) this file is here for the benefit
 # of community developers git clones - see MDL-51458.
-
+//test
 notifications:
   email:
     if: env(MOODLE_EMAIL) != no
