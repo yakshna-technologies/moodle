@@ -1,0 +1,142 @@
+# This is a sample build configuration for PHP.
+# Check our guides at https://confluence.atlassian.com/x/e8YWN for more examples.
+# Only use spaces to indent your .yml configuration.
+# -----
+
+# Specify a docker image from Docker Hub as your build environment.
+# All of your pipeline scripts will be executed within this docker image.
+
+image: php:7.1.1
+
+# You might want to create and access a service (like a database) as part
+# of your Pipeline workflow. You can do so by defining it as a service here.
+
+definitions:
+    services:
+
+        # Your service can be named anything - what runs is determined
+        # by the Docker Hub image you specify.
+
+        mongo:
+            image: mongo
+
+# All of your Pipelines will be defined in the `pipelines` section.
+# You can have any number of Pipelines, but they must all have unique
+# names. The default Pipeline is simply named `default`.
+
+pipelines:
+    default:
+
+        # Each Pipeline consists of one or more steps which each execute
+        # sequentially in separate docker containers.
+        #
+        # name: optional name for this step
+        # script: the commands you wish to execute in this step, in order
+
+        - step:
+            name: Hello World
+            script:
+                - echo "Hello, world. Let's get started."
+                - echo "Every single Step executes in a new docker container."
+                - echo "If any of these commands fail, this Step will fail."
+                - echo "If any of these Steps fail, this Pipeline run will fail."
+
+        # Your Pipeline automatically contains a copy of your code in its working
+        # directory; however, the docker image may not be preconfigured with all
+        # of the PHP extensions your project requires. You may need to install
+        # them yourself, as shown below.
+        #
+        # REMEMBER: each Step executes in a separate container, so scripts you
+        # execute here will have no effect on the containers executing future
+        # Steps. You might need to copy files manually between Steps, or you
+        # might prefer to run everything in one Step.
+        #
+        # caches: idk lol
+        # artifacts: files which should be copied into the next Pipeline Step
+
+        - step:
+            name: Example - Install PHP Extensions
+            caches:
+                - composer
+            artifacts:
+                - vendor/**
+            script:
+                # See more on Docker Hub: https://hub.docker.com/r/library/php/
+                - echo "The PHP docker image contains these helper commands for installing and configuring extensions."
+
+                - echo "You can install PHP extensions manually using your container's package manager and scripts."
+                - echo "In this case, we will install the GD Graphics Library extension for PHP."
+                - apt-get update && apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng12-dev
+                - docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/
+                - docker-php-ext-install -j$(nproc) gd
+
+                - echo "You can also install PHP extensions using PECL."
+                - echo "In this case, we will install the memcached extension for PHP."
+                - apt-get update && apt-get install -y libmemcached-dev zlib1g-dev
+                - echo '' | pecl install memcached
+                - docker-php-ext-enable memcached
+
+        # Similarly to PHP extensions, you may need to install your project's
+        # dependencies manually, as shown below.
+        #
+        # REMEMBER: each Step executes in a separate container, so scripts you
+        # execute here will have no effect on the containers executing future
+        # Steps. You might need to copy files manually between Steps, or you
+        # might prefer to run everything in one Step.
+
+        - step:
+            name: Example - Install Project Dependencies
+            caches:
+                - composer
+            artifacts:
+                - vendor/**
+            script:
+                - echo "You can install some dependencies via your docker image's preferred package manager."
+                - apt-get update && apt-get install -y unzip
+
+                - echo "The PHP docker image includes the Pear dependency manager, if you want to use it for dependencies."
+                - pear install pear/PHP_CodeSniffer
+
+                - echo "You can also install Composer to automatically manage your PHP dependencies."
+                - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+                - echo "You can install Composor packages here, or you can set them in your composor.json file."
+                - composer require phpunit/phpunit
+                - composer install
+
+        # Running a PHP script as part of your Pipeline process is straightfoward.
+
+        - step:
+            name: Example - Run a PHP Script
+            caches:
+                - composer
+            artifacts:
+                - vendor/**
+            script:
+                - php run.php
+
+        # One common use case of Pipelines is running Unit Tests on your codebase.
+        # In PHP, this is commonly done with PHPUnit.
+
+        - step:
+            name: Example - Unit Testing
+            caches:
+                - composer
+            artifacts:
+                - vendor/**
+            script:
+                - vendor/bin/phpunit --bootstrap vendor/autoload.php tests
+
+        # You can even choose to run another service (like a database) alongside
+        # a Pipeline Step. Simply define it as a service (see top of file) and
+        # list it under the `services` directive. In this case, we are running
+        # the `mongo` service we defined at the top of the file.
+
+        - step:
+            name: Example - Run a Database
+            caches:
+                - composer
+            services:
+                - mongo
+            script:
+                - php run.php
